@@ -166,10 +166,10 @@ export const useJourneyStore = create<JourneyState>((set, get) => ({
         phone: formData.finalForm.phone,
         message: formData.finalForm.message,
         stepResponses: {
-          step1: formData.step1 || undefined,
-          step2: formData.step2 || undefined,
-          step3: formData.step3 || undefined,
-          step4: formData.step4 || undefined,
+          step1: (formData.step1 ?? undefined) as unknown as Record<string, unknown> | undefined,
+          step2: (formData.step2 ?? undefined) as unknown as Record<string, unknown> | undefined,
+          step3: (formData.step3 ?? undefined) as unknown as Record<string, unknown> | undefined,
+          step4: (formData.step4 ?? undefined) as unknown as Record<string, unknown> | undefined,
         },
         submissionType: "form",
       });

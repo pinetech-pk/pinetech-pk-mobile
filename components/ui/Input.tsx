@@ -49,6 +49,7 @@ interface TextAreaProps extends InputProps {
 
 export function TextArea({
   numberOfLines = 4,
+  inputStyle,
   ...props
 }: TextAreaProps) {
   return (
@@ -56,7 +57,7 @@ export function TextArea({
       {...props}
       multiline
       numberOfLines={numberOfLines}
-      inputStyle={[styles.textArea, props.inputStyle]}
+      inputStyle={StyleSheet.flatten([styles.textArea, inputStyle])}
       textAlignVertical="top"
     />
   );
