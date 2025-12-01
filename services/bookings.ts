@@ -8,11 +8,17 @@ import type {
   AvailableSlotsResponse,
   BookingStatus,
 } from "@/types";
+import { USE_MOCK_DATA, mockApi } from "@/lib/mockData";
 
 /**
  * Get available booking slots (public endpoint)
  */
 export async function getAvailableSlots(): Promise<AvailableSlotsResponse> {
+  // Use mock data if enabled
+  if (USE_MOCK_DATA) {
+    return mockApi.getAvailableSlots();
+  }
+
   return api.get<AvailableSlotsResponse>("/api/bookings/slots");
 }
 
@@ -22,6 +28,11 @@ export async function getAvailableSlots(): Promise<AvailableSlotsResponse> {
 export async function createBooking(
   data: CreateBookingRequest
 ): Promise<CreateBookingResponse> {
+  // Use mock data if enabled
+  if (USE_MOCK_DATA) {
+    return mockApi.createBooking(data as Partial<ConsultationBooking>);
+  }
+
   return api.post<CreateBookingResponse>("/api/bookings", data);
 }
 
@@ -29,6 +40,11 @@ export async function createBooking(
  * Get all bookings (admin only)
  */
 export async function getBookings(): Promise<{ bookings: ConsultationBooking[] }> {
+  // Use mock data if enabled
+  if (USE_MOCK_DATA) {
+    return mockApi.getBookings();
+  }
+
   return api.get<{ bookings: ConsultationBooking[] }>("/api/bookings", {
     requiresAuth: true,
   });
