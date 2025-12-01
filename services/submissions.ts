@@ -6,6 +6,7 @@ import type {
   CreateSubmissionRequest,
   CreateSubmissionResponse,
 } from "@/types";
+import { USE_MOCK_DATA, mockApi } from "@/lib/mockData";
 
 /**
  * Submit a user inquiry (public endpoint)
@@ -13,6 +14,11 @@ import type {
 export async function createSubmission(
   data: CreateSubmissionRequest
 ): Promise<CreateSubmissionResponse> {
+  // Use mock data if enabled
+  if (USE_MOCK_DATA) {
+    return mockApi.createSubmission(data as Partial<UserSubmission>);
+  }
+
   return api.post<CreateSubmissionResponse>("/api/user-submissions", data);
 }
 
@@ -20,6 +26,11 @@ export async function createSubmission(
  * Get all submissions (admin only)
  */
 export async function getSubmissions(): Promise<UserSubmission[]> {
+  // Use mock data if enabled
+  if (USE_MOCK_DATA) {
+    return mockApi.getSubmissions();
+  }
+
   return api.get<UserSubmission[]>("/api/user-submissions", {
     requiresAuth: true,
   });

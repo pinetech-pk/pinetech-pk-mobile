@@ -2,16 +2,27 @@
 
 import { api } from "./api";
 import type { LoginRequest, LoginResponse, AdminUser } from "@/types";
+import { USE_MOCK_DATA, mockApi, mockAdminUser } from "@/lib/mockData";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const MOCK_AUTH_KEY = "pinetech_mock_auth";
 
 /**
  * Admin login
- * Note: The web app uses NextAuth with credentials provider.
- * For mobile, we'll need a compatible endpoint or JWT-based auth.
  */
 export async function login(credentials: LoginRequest): Promise<LoginResponse> {
   try {
-    // This endpoint would need to be added to the web app API
-    // For now, we're preparing the structure
+    // Use mock data if enabled
+    if (USE_MOCK_DATA) {
+      const response = await mockApi.login(credentials.email, credentials.password);
+      if (response.success) {
+        await AsyncStorage.setItem(MOCK_AUTH_KEY, "true");
+        await api.setAuthToken(response.token || "mock-token");
+      }
+      return response;
+    }
+
+    // Real API call
     const response = await api.post<LoginResponse>(
       "/api/auth/mobile-login",
       credentials
@@ -35,25 +46,34 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
  */
 export async function logout(): Promise<void> {
   await api.clearAuthToken();
+  await AsyncStorage.removeItem(MOCK_AUTH_KEY);
 }
 
 /**
  * Check if user is authenticated
  */
 export async function isAuthenticated(): Promise<boolean> {
+  if (USE_MOCK_DATA) {
+    const mockAuth = await AsyncStorage.getItem(MOCK_AUTH_KEY);
+    return mockAuth === "true";
+  }
   return api.hasAuthToken();
 }
 
 /**
  * Get current user info
- * This would need to be implemented on the backend
  */
 export async function getCurrentUser(): Promise<AdminUser | null> {
   try {
+    // Use mock data if enabled
+    if (USE_MOCK_DATA) {
+      const isAuth = await isAuthenticated();
+      return isAuth ? mockAdminUser : null;
+    }
+
     const hasToken = await api.hasAuthToken();
     if (!hasToken) return null;
 
-    // This endpoint would need to be added to the web app API
     const response = await api.get<{ user: AdminUser }>("/api/auth/me", {
       requiresAuth: true,
     });
